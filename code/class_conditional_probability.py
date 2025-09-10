@@ -1,3 +1,6 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
 def compute_class_stats(X, y):
     means = []
     stds = []
