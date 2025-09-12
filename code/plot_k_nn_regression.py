@@ -20,3 +20,5 @@ def plot_mse_vs_k(k_list, mse_list, mse_lin=None, title="Mean Squared Error vs k
     ax.set_title(title)
     ax.legend()
     plt.show()
+    
+    return None
