@@ -4,9 +4,9 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import roc_curve, auc
 import matplotlib.pyplot as plt
 
-def plot_knn_roc_curves(X_train, X_test, y_train, y_test, k_values, scaler=None):
+def get_knn_roc_data(X_train, X_test, y_train, y_test, k_values, scaler=None):
     """
-    Plot ROC curves for k-NN classifier with different k values
+    Calculate ROC curve data for k-NN classifier with different k values
     
     Parameters:
     X_train: Training features
@@ -15,17 +15,16 @@ def plot_knn_roc_curves(X_train, X_test, y_train, y_test, k_values, scaler=None)
     y_test: Test labels
     k_values: List of k values to test
     scaler: Scaler object (default: StandardScaler)
+    
+    Returns:
+    Dictionary with k values as keys and tuples of (fpr, tpr, auc) as values
     """
-
+    
     # use StandardScaler if no scaler is provided
     if scaler is None:
         scaler = StandardScaler()
     
-    # create a figure for the ROC curves
-    plt.figure(figsize=(10, 8))
-    
-    # store AUC values for each k
-    auc_values = {}
+    roc_data = {}
     
     # iterate over different k values
     for k in k_values:
@@ -42,16 +41,32 @@ def plot_knn_roc_curves(X_train, X_test, y_train, y_test, k_values, scaler=None)
         model_knn.fit(X_train, y_train)
         
         # get prediction probabilities for the positive class
-        y_score = model_knn.predict_proba(X_test)[:, 1] # make sure to use predict_proba instead of predict for ROC curve
+        y_score = model_knn.predict_proba(X_test)[:, 1]
         
         # calculate the ROC curve
         fpr, tpr, thresholds = roc_curve(y_test, y_score, pos_label=1)
         
         # calculate the AUC
         roc_auc = auc(fpr, tpr)
-        auc_values[k] = roc_auc
         
-        # plot the ROC curve for this k value
+        # store the data
+        roc_data[k] = (fpr, tpr, roc_auc)
+    
+    return roc_data
+
+def plot_knn_roc_curves(roc_data):
+    """
+    Plot ROC curves for k-NN classifier using pre-calculated ROC data
+    
+    Parameters:
+    roc_data: Dictionary with k values as keys and tuples of (fpr, tpr, auc) as values
+    """
+    
+    # create a figure for the ROC curves
+    plt.figure(figsize=(10, 8))
+    
+    # iterate over the ROC data and plot each curve
+    for k, (fpr, tpr, roc_auc) in roc_data.items():
         plt.plot(fpr, tpr, lw=2, label=f'k = {k} (AUC = {roc_auc:.3f})')
     
     # plot the diagonal line (random classifier baseline)
@@ -68,4 +83,6 @@ def plot_knn_roc_curves(X_train, X_test, y_train, y_test, k_values, scaler=None)
     
     # display the plot
     plt.show()
+
+    return None
     
