@@ -1,13 +1,15 @@
 import numpy as np
-import matplotlib.pyplot as plt
 
 
 def lsq(X, y):
     """
-    Least squares linear regression
-    :param X: Input data matrix
-    :param y: Target vector
-    :return: Estimated coefficient vector for the linear regression
+    Least squares linear regression.
+
+    Args:
+        X (array): Input data matrix.
+        y (array): Target vector.
+    
+    Returns estimated coefficient vector for the linear regression
     """
 
     # add column of ones for the intercept
@@ -19,7 +21,17 @@ def lsq(X, y):
 
     return beta
 
-def regression(weights, X) :
+
+def regression(weights, X):
+    """
+    Performs regression on the data using the calculated weights.
+
+    Args:
+        weights (array): Coefficients.
+        X (array): Input data matrix
+    
+    Returns predicted y    
+    """
     ones = np.ones((len(X), 1))
     X = np.concatenate((ones, X), axis=1)
     y_pred = np.dot(X, weights)
@@ -27,5 +39,13 @@ def regression(weights, X) :
 
 
 def mean_squared_error(y_true, y_pred):
-    return np.mean((y_true - y_pred) ** 2)
+    """
+    Calculates the mean squared error for the predicted vector and the target vector.
 
+    Args:
+        y_true (array): Target vector.
+        y_pred (array): Predicted vector.
+
+    Returns calculated MSE value
+    """
+    return np.mean((y_true - y_pred) ** 2)
