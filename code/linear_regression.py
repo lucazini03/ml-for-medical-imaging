@@ -11,7 +11,6 @@ def lsq(X, y):
     
     Returns estimated coefficient vector for the linear regression
     """
-
     # add column of ones for the intercept
     ones = np.ones((len(X), 1))
     X = np.concatenate((ones, X), axis=1)

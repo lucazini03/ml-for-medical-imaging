@@ -1,13 +1,16 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def compute_class_stats(X, y):
     """
     Computes the means and standard deviations of all features for two classes (benign and malignant).
     They will then be used to plot the Gaussian approximations of the class-conditional distributions.
+
     Args:
         X (numpy.ndarray): A 2D array of shape (n_samples, n_features) containing the feature data.
         y (numpy.ndarray): A 1D array of shape (n_samples,) containing the class labels (0 for malignant, 1 for benign).
+
     Returns:
         means (numpy.ndarray): A 2D array of shape (n_features, 2) containing the means of the Gaussian distributions 
                                for each feature and class. The first column corresponds to class 0 (malignant) 
@@ -18,13 +21,16 @@ def compute_class_stats(X, y):
     """
     means = []
     stds = []
+
     for idx in range(X.shape[1]):
         data_feature = X[:, idx] # get feature column, which will then be split according to class label
         data_feature_benign = data_feature[y == 1]
         data_feature_malignant = data_feature[y == 0]
         means.append([np.mean(data_feature_malignant), np.mean(data_feature_benign)])
         stds.append([np.std(data_feature_malignant), np.std(data_feature_benign)])
+
     return np.array(means), np.array(stds)
+
 
 def plot_class_conditional(X, y, feature_names, means, stds):
     """
@@ -41,9 +47,7 @@ def plot_class_conditional(X, y, feature_names, means, stds):
                               distributions for each feature and class. The first column corresponds to class 0 
                               (malignant) and the second column corresponds to class 1 (benign).
     
-    Returns:
-        None
-
+    Returns None
     """
     n_features = X.shape[1]
     n_cols = 3
@@ -75,3 +79,4 @@ def plot_class_conditional(X, y, feature_names, means, stds):
 
     plt.tight_layout()
     plt.show()
+    return None

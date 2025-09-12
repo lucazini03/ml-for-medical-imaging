@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.spatial
 
+
 def knn_regression(x_data, y_data, x_test, k):
     """
     Performs k-nearest neighbor regression. Calculates distances between test nodes and all training nodes.
