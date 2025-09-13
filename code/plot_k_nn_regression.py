@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 
+
 def plot_mse_vs_k(k_list, mse_list, mse_lin=None, title="Mean Squared Error vs k value"):
     """
     Plots the Mean Squared Error (MSE) for different k values.
