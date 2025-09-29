@@ -27,8 +27,7 @@ def compute_bootstrap_coefficients(gene_expression, drug_response, n_bootstraps=
     # Bootstrap loop
     print("Computing bootstrap coefficients...")
     for i in range(n_bootstraps):
-        if i % 10 == 0:  # Progress update
-            print(f"Completed {i}/{n_bootstraps} bootstrap iterations")
+        print(f"\rCompleted {i+1}/{n_bootstraps} bootstrap iterations", end='') # Progress update
         
         # Bootstrap sample
         X_boot, y_boot = resample(gene_expression, drug_response.values.ravel(), random_state=i)
@@ -47,7 +46,7 @@ def compute_bootstrap_coefficients(gene_expression, drug_response, n_bootstraps=
                 coefficient_profiles[gene][i, j] = lasso.coef_[k]
     
     # Compute additional analysis metrics
-    print("Computing analysis metrics...")
+    print("\nComputing analysis metrics...")
     non_zero_counts = np.zeros(len(alphas))
     avg_variance = np.zeros(len(alphas))
     
