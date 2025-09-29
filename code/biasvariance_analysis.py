@@ -86,85 +86,44 @@ def compute_bootstrap_coefficients(gene_expression, drug_response, n_bootstraps=
     }
     
     return results
-
-def plot_bootstrap_results(results, optimal_alpha=0.3):
+    
+def plot_bootstrap_results_combined(results, optimal_alpha=0.3, top_k=10):
     """
-    Create plots from bootstrap analysis results
+    Plot coefficient profiles for selected genes in a single combined plot.
     
     Parameters:
-    results: Dictionary with computed results from compute_bootstrap_coefficients
-    optimal_alpha: Optimal alpha value to mark on plots
+    results: dict - output of compute_bootstrap_coefficients
+    optimal_alpha: float - value of alpha to highlight
+    top_k: int - number of top genes to display (ranked by max |coef|)
     """
-    # Unpack results
     coefficient_profiles = results['coefficient_profiles']
     alphas = results['alphas']
-    non_zero_counts = results['non_zero_counts']
-    avg_variance = results['avg_variance']
     selected_genes = results['selected_genes']
     n_bootstraps = results['n_bootstraps']
     
-    # Create the coefficient profile plot
-    plt.figure(figsize=(14, 10))
+    # Rank genes by maximum absolute mean coefficient
+    gene_scores = {}
+    for gene in selected_genes:
+        mean_coef = np.mean(coefficient_profiles[gene], axis=0)
+        gene_scores[gene] = np.max(np.abs(mean_coef))
+    top_genes = sorted(gene_scores, key=gene_scores.get, reverse=True)[:top_k]
     
-    # Plot each selected gene
-    n_cols = 4
-    n_rows = int(np.ceil(len(selected_genes) / n_cols))
-    
-    for idx, gene in enumerate(selected_genes):
-        plt.subplot(n_rows, n_cols, idx + 1)
-        
-        # Calculate mean and standard deviation across bootstraps
+    # Plot combined figure
+    plt.figure(figsize=(10, 6))
+    for gene in top_genes:
         mean_coef = np.mean(coefficient_profiles[gene], axis=0)
         std_coef = np.std(coefficient_profiles[gene], axis=0)
-        
-        # Plot mean coefficient profile
-        plt.semilogx(alphas, mean_coef, 'b-', linewidth=2, label='Mean coefficient')
-        
-        # Add error bars (shaded area for standard deviation)
-        plt.fill_between(alphas, mean_coef - std_coef, mean_coef + std_coef, 
-                        alpha=0.3, color='blue', label='±1 SD')
-        
-        # Mark the optimal alpha
-        plt.axvline(optimal_alpha, color='red', linestyle='--', linewidth=1.5, 
-                   label=f'Optimal alpha ({optimal_alpha})')
-        
-        plt.xlabel('Alpha (log scale)')
-        plt.ylabel('Coefficient value')
-        plt.title(f'Gene: {gene}')
-        plt.grid(True, which="both", ls="--", alpha=0.3)
-        
-        # Add legend only to the first subplot
-        if idx == 0:
-            plt.legend(loc='upper right', fontsize=8)
+        plt.semilogx(alphas, mean_coef, label=gene)
+        plt.fill_between(alphas, mean_coef - std_coef, mean_coef + std_coef, alpha=0.15)
     
-    plt.tight_layout()
-    plt.suptitle(f'Lasso Coefficient Profiles with Bootstrap Variability ({n_bootstraps} iterations)\n'
-                'Effect of Regularization on Bias and Variance', 
-                fontsize=14, fontweight='bold', y=1.02)
-    plt.show()
+    # Mark optimal alpha
+    plt.axvline(optimal_alpha, color='red', linestyle='--', linewidth=1.5, 
+                label=f'Optimal alpha ({optimal_alpha})')
     
-    # Additional analysis: Show overall trends
-    plt.figure(figsize=(12, 5))
-    
-    # Plot 1: Average number of non-zero coefficients vs alpha
-    plt.subplot(1, 2, 1)
-    plt.semilogx(alphas, non_zero_counts, 'g-', linewidth=2)
-    plt.axvline(optimal_alpha, color='red', linestyle='--', label='Optimal alpha')
     plt.xlabel('Alpha (log scale)')
-    plt.ylabel('Average number of non-zero coefficients')
-    plt.title('Model Sparsity vs Regularization')
-    plt.legend()
+    plt.ylabel('Coefficient value')
+    plt.title(f'Lasso coefficient profiles (mean ± std over {n_bootstraps} bootstraps)\nTop {top_k} genes')
+    plt.legend(fontsize=8, ncol=2)
     plt.grid(True, which="both", ls="--", alpha=0.3)
-    
-    # Plot 2: Average coefficient variance vs alpha
-    plt.subplot(1, 2, 2)
-    plt.semilogx(alphas, avg_variance, 'r-', linewidth=2)
-    plt.axvline(optimal_alpha, color='red', linestyle='--', label='Optimal alpha')
-    plt.xlabel('Alpha (log scale)')
-    plt.ylabel('Average coefficient variance')
-    plt.title('Parameter Variance vs Regularization')
-    plt.legend()
-    plt.grid(True, which="both", ls="--", alpha=0.3)
-    
     plt.tight_layout()
     plt.show()
